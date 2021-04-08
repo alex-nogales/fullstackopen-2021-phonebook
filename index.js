@@ -14,6 +14,15 @@ morgan.token('test', (request, response) => {
 })
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :test'))
 
+const errorHandler = (error, request, response, next) => {
+    console.error(error.message)
+    if (error.name === 'CastError'){
+        return response.status(400).send({error: 'malformatted id'})
+    }
+    next(error)
+}
+
+/* 
 let persons = [ 
     {
         id: 1,
@@ -30,7 +39,7 @@ let persons = [
         name: "Blitz Mithrandir",
         number: 666
     }
-]
+] */
 
 //Utiities
 const generateId = max => {
@@ -78,10 +87,11 @@ app.post('/api/persons', (request, response) => {
 })
 
 app.delete('/api/persons/:id', (request, response) => {
-    const id = Number(request.param.id)
-    persons = persons.filter(p => p.id === id)
-
-    response.status(204).end()
+    Person.findByIdAndDelete(request.params.id)
+        .then(result => {
+            response.status(204).end()
+        })
+        .catch(error => next(error))
 })
 
 //info
@@ -96,3 +106,5 @@ const PORT = process.env.PORT
 app.listen(PORT, () => {
     console.log('App running on localhost:3001')
 })
+
+app.use(errorHandler)
