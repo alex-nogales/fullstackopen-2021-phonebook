@@ -91,7 +91,7 @@ app.get('/info', (request, response) => {
     response.send(`<p>Phonebook has info of ${personLength} persons</p><p>${timestamp}</p>`)
 })
 
-const PORT = 3001
+const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
     console.log('App running on localhost:3001')
 })
