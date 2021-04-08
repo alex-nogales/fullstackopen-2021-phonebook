@@ -1,13 +1,5 @@
 const mongoose = require('mongoose')
 
-/* Note.find({}).then(result => {
-    result.forEach(note => {
-      console.log(note)
-    })
-    mongoose.connection.close()
-  }) */
-
-
 if (process.argv.length < 3 ) {
     console.log('password as argument needed')
     process.exit(1)

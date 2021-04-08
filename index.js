@@ -1,7 +1,9 @@
+require('dotenv').config()
 const express = require('express')
 const app = express()
 const morgan = require('morgan')
 const cors = require('cors')
+const Person = require('./models/person')
 
 app.use(cors())
 app.use(express.static('build'))
@@ -40,9 +42,12 @@ app.get('/', (request, response) => {
     response.send('<h1>Phonebook on backend!</h1>')
 })
 
+
 //api/persons
 app.get('/api/persons', (request, response) => {
-    response.json(persons)
+    Person.find({}).then(persons => {
+        response.json(persons.map(person => person.toJSON()))
+    })
 })
 
 app.get('/api/persons/:id', (request, response) => {
@@ -57,22 +62,19 @@ app.get('/api/persons/:id', (request, response) => {
 
 app.post('/api/persons', (request, response) => {
     const body = request.body
-    const findPerson = persons.find(p => p.name === body.name)
-
-    if (findPerson) {
-        return response.status(400).json({error: 'this person already exists'})
-    }
 
     if (!body.name || !body.number) {
         return response.status(400).json({error: 'Name or number are missing!'})
     }
-    const person = {
-        id: generateId(1000),
+
+    const person = new Person({
         name: body.name,
         number: body.number
-    }
-    persons = persons.concat(person)
-    response.json(person)
+    })
+    person.save().then(result => {
+        persons = persons.concat(person)
+        response.json(person)
+    })
 })
 
 app.delete('/api/persons/:id', (request, response) => {
@@ -90,7 +92,7 @@ app.get('/info', (request, response) => {
     response.send(`<p>Phonebook has info of ${personLength} persons</p><p>${timestamp}</p>`)
 })
 
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT
 app.listen(PORT, () => {
     console.log('App running on localhost:3001')
 })
