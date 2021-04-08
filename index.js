@@ -41,16 +41,10 @@ let persons = [
     }
 ] */
 
-//Utiities
-const generateId = max => {
-    return Math.floor(Math.random() * max)
-}
-
 //root
 app.get('/', (request, response) => {
     response.send('<h1>Phonebook on backend!</h1>')
 })
-
 
 //api/persons
 app.get('/api/persons', (request, response) => {
@@ -60,13 +54,15 @@ app.get('/api/persons', (request, response) => {
 })
 
 app.get('/api/persons/:id', (request, response) => {
-    const id = Number(request.params.id)
-    const person = persons.find(p => p.id === id )
-    if (person) {
-        response.json(person)
-    } else {
-        response.status(404).end()
-    }
+    Person.findById(request.params.id)
+        .then(person => {
+            if(person) {
+                response.json(person.toJSON())
+            } else {
+                response.status(404).end()
+            }
+        })
+        .catch(error => next(error))
 })
 
 app.post('/api/persons', (request, response) => {
@@ -80,10 +76,34 @@ app.post('/api/persons', (request, response) => {
         name: body.name,
         number: body.number
     })
-    person.save().then(result => {
-        persons = persons.concat(person)
-        response.json(person)
+    person
+        .save()
+        .then(savedPerson => savedPerson.toJSON())
+        .then(formattedPerson => {
+            response.json(formattedPerson)
+        })
+})
+
+app.put('/api/persons/:id', (request, response) => {
+    const body = request.body 
+
+    const person = {
+        name: body.name,
+        number: body.number
+    }
+
+    Person.findByIdAndUpdate(request.params.id, person, {
+        new: true
     })
+      .then(updatedPerson => {
+          if(updatedPerson) {
+              response.json(updatedPerson.toJSON())
+          } else {
+              response.status(404).end()
+          }
+      })
+      .catch(error => next(error))
+
 })
 
 app.delete('/api/persons/:id', (request, response) => {
@@ -97,9 +117,13 @@ app.delete('/api/persons/:id', (request, response) => {
 //info
 app.get('/info', (request, response) => {
     timestamp = new Date()
-    personLength = persons.length
-
-    response.send(`<p>Phonebook has info of ${personLength} persons</p><p>${timestamp}</p>`)
+    Person.estimatedDocumentCount({})
+        .then( count => {
+            const message = 
+            `<p>Phonebook has info of ${count} persons<p>` + 
+            `<p>${timestamp}</p>`
+            response.send(message)
+        })
 })
 
 const PORT = process.env.PORT
