@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 
+
 if (process.argv.length < 3 ) {
     console.log('password as argument needed')
     process.exit(1)
@@ -13,8 +14,15 @@ const url =
 mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true })
 
 const personSchema = new mongoose.Schema({
-    name: String,
-    number: String
+    name: {
+        type: String,
+        unique: true, 
+        required: true
+    },
+    number: {
+        type: String,
+        required: true
+    }
 })
 const Person = mongoose.model('Person', personSchema)
 
