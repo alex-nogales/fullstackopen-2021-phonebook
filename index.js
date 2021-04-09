@@ -22,25 +22,6 @@ const errorHandler = (error, request, response, next) => {
     next(error)
 }
 
-/* 
-let persons = [ 
-    {
-        id: 1,
-        name: "Alex Nogales",
-        number: 123456
-    },
-    {
-        id: 2,
-        name: "Fabiola Concha",
-        number: 43215
-    },
-    {
-        id: 3,
-        name: "Blitz Mithrandir",
-        number: 666
-    }
-] */
-
 //root
 app.get('/', (request, response) => {
     response.send('<h1>Phonebook on backend!</h1>')
