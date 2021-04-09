@@ -1,3 +1,5 @@
+/* eslint-disable no-undef */
+/* Disabled no-undef because of process function*/
 const mongoose = require('mongoose')
 
 
@@ -8,7 +10,7 @@ if (process.argv.length < 3 ) {
 
 const password = process.argv[2]
 
-const url = 
+const url =
     `mongodb+srv://fullstack:${password}@cluster0.vdr7k.mongodb.net/phonebook-app?retryWrites=true&w=majority`
 
 mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true })
@@ -16,7 +18,7 @@ mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, useFind
 const personSchema = new mongoose.Schema({
     name: {
         type: String,
-        unique: true, 
+        unique: true,
         required: true
     },
     number: {
